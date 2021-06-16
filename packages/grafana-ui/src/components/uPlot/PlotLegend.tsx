@@ -44,6 +44,7 @@ export const PlotLegend: React.FC<PlotLegendProps> = ({
         disabled: !seriesConfig.show ?? false,
         fieldIndex,
         color: seriesConfig.lineColor!,
+        name: field.name,
         label,
         yAxis: axisPlacement === AxisPlacement.Left ? 1 : 2,
         getDisplayValues: () => {
