@@ -4,6 +4,7 @@ WORKDIR /usr/src/app/
 
 COPY package.json yarn.lock ./
 COPY packages packages
+RUN apk add git
 
 RUN yarn install --pure-lockfile --no-progress
 
