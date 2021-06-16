@@ -332,7 +332,7 @@ func (sn *SlackNotifier) slackFileUpload(evalContext *alerting.EvalContext, log 
 		evalContext.ImageOnDiskPath = filepath.Join(setting.HomePath, "public/img/mixed_styles.png")
 	}
 	log.Info("Uploading to slack via file.upload API")
-	headers, uploadBody, err := sn.generateSlackBody(evalContext.ImageOnDiskPath, token, recipient)
+	headers, uploadBody, err := sn.generateSlackBody(evalContext.ImageOnDiskPath, token, recipient, evalContext.GetNotificationTitle())
 	if err != nil {
 		return err
 	}
@@ -344,7 +344,7 @@ func (sn *SlackNotifier) slackFileUpload(evalContext *alerting.EvalContext, log 
 	return nil
 }
 
-func (sn *SlackNotifier) generateSlackBody(path string, token string, recipient string) (map[string]string, bytes.Buffer, error) {
+func (sn *SlackNotifier) generateSlackBody(path string, token string, recipient string, initial_comment string) (map[string]string, bytes.Buffer, error) {
 	// Slack requires all POSTs to files.upload to present
 	// an "application/x-www-form-urlencoded" encoded querystring
 	// See https://api.slack.com/methods/files.upload
@@ -376,6 +376,9 @@ func (sn *SlackNotifier) generateSlackBody(path string, token string, recipient 
 		return nil, b, err
 	}
 	if _, err := io.Copy(fw, f); err != nil {
+		return nil, b, err
+	}
+	if err := w.WriteField("initial_comment", initial_comment); err != nil {
 		return nil, b, err
 	}
 	// Add the authorization token
